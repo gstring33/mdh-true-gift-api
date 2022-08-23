@@ -5,6 +5,7 @@ namespace App\Entity;
 use App\Repository\GiftListRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
+use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 
 #[ORM\Entity(repositoryClass: GiftListRepository::class)]
@@ -23,6 +24,9 @@ class GiftList
 
     #[ORM\OneToMany(mappedBy: 'giftList', targetEntity: Gift::class, orphanRemoval: true)]
     private Collection $Gifts;
+
+    #[ORM\Column(length: 255)]
+    private ?string $uuid = null;
 
     public function __construct()
     {
@@ -97,4 +101,17 @@ class GiftList
 
         return $this;
     }
+
+    public function getUuid(): ?string
+    {
+        return $this->uuid;
+    }
+
+    public function setUuid(string $uuid): self
+    {
+        $this->uuid = $uuid;
+
+        return $this;
+    }
+
 }
