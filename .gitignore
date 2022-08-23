@@ -4,7 +4,6 @@
 /.env.local.php
 /.env.*.local
 /config/secrets/prod/prod.decrypt.private.php
-/config/secrets/prod/prod.encrypt.public.php
 /public/bundles/
 /var/
 /vendor/
@@ -14,3 +13,7 @@
 .idea/
 ###< IDE ###
 
+
+###> lexik/jwt-authentication-bundle ###
+/config/jwt/*.pem
+###< lexik/jwt-authentication-bundle ###
