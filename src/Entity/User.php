@@ -48,6 +48,9 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\OneToOne(targetEntity: self::class, cascade: ['persist', 'remove'])]
     private ?self $offerGiftTo = null;
 
+    #[ORM\OneToOne(inversedBy: 'user', cascade: ['persist', 'remove'])]
+    private ?GiftList $giftList = null;
+
     public function getId(): ?int
     {
         return $this->id;
@@ -198,6 +201,18 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     public function setOfferGiftTo(?self $offerGiftTo): self
     {
         $this->offerGiftTo = $offerGiftTo;
+
+        return $this;
+    }
+
+    public function getGiftList(): ?GiftList
+    {
+        return $this->giftList;
+    }
+
+    public function setGiftList(?GiftList $giftList): self
+    {
+        $this->giftList = $giftList;
 
         return $this;
     }
