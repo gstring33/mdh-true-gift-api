@@ -10,11 +10,9 @@ use Symfony\Component\HttpFoundation\Request;
 
 class UserConverter implements ParamConverterInterface
 {
-
     public function apply(Request $request, ParamConverter $configuration)
     {
         $data = json_decode($request->getContent(), true);
-        $password = strtolower($data['firstname'][0] . $data['lastname']) . rand(0,999);
         $list = (new GiftList())
             ->setUuid(uniqid('', false))
             ->setIsPublished(0);
@@ -23,9 +21,9 @@ class UserConverter implements ParamConverterInterface
             ->setLastname($data['lastname'])
             ->setEmail($data['email'])
             ->setIsActive(0)
+            ->setPlainTextPassword($data['password'])
             //->setRoles($data['roles'])
             ->setUuid(uniqid('', false))
-            ->setPassword($password)
             ->setGiftList($list);
 
         $request->attributes->set($configuration->getName(), $user);
