@@ -22,9 +22,10 @@ class UserConverter implements ParamConverterInterface
             ->setEmail($data['email'])
             ->setIsActive(0)
             ->setPlainTextPassword($data['password'])
-            //->setRoles($data['roles'])
             ->setUuid(uniqid('', false))
             ->setGiftList($list);
+        $roles = !isset($roles['roles']) ? ['ROLE_USER'] : $roles['roles'];
+        $user->setRoles($roles);
 
         $request->attributes->set($configuration->getName(), $user);
     }
