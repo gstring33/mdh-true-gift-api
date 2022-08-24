@@ -22,9 +22,6 @@ security:
             pattern: ^/api
             stateless: true
             jwt: ~
-        dev:
-            pattern: ^/(_(profiler|wdt)|css|images|js)/
-            security: false
         main:
             lazy: true
             provider: app_user_provider
@@ -35,10 +32,13 @@ security:
             # https://symfony.com/doc/current/security/impersonating_user.html
             # switch_user: true
 
-    # Easy way to control access for large sections of your site
-    # Note: Only the *first* access control that matches will be used
+    role_hierarchy:
+        ROLE_MEMBER: ROLE_USER
+        ROLE_ADMIN: [ROLE_MEMBER, ROLE_MANAGER]
+
     access_control:
         - { path: ^/api/login, roles: PUBLIC_ACCESS }
+        - { path: ^/api/user, roles: [ROLE_ADMIN, IS_AUTHENTICATED_FULLY] }
         - { path: ^/api, roles: IS_AUTHENTICATED_FULLY }
 
 when@test:
