@@ -12,7 +12,30 @@ class UserConverter implements ParamConverterInterface
 {
     public function apply(Request $request, ParamConverter $configuration)
     {
-        $data = json_decode($request->getContent(), true);
+        if ($this->isNewCreatedUser($request)) {
+            $data = json_decode($request->getContent(), true);
+            $user = $this->convertNewUser($data);
+        }
+
+        $request->attributes->set($configuration->getName(), $user);
+    }
+
+    public function supports(ParamConverter $configuration)
+    {
+        return $configuration->getName() === 'user';
+    }
+
+    private function isNewCreatedUser (Request $request)
+    {
+        return $request->getMethod() === 'POST';
+    }
+
+    /**
+     * @param array $data
+     * @return User
+     */
+    private function convertNewUser (array $data) : User
+    {
         $list = (new GiftList())
             ->setUuid(uniqid('', false))
             ->setIsPublished(0);
@@ -27,11 +50,6 @@ class UserConverter implements ParamConverterInterface
         $roles = !isset($roles['roles']) ? ['ROLE_USER'] : $roles['roles'];
         $user->setRoles($roles);
 
-        $request->attributes->set($configuration->getName(), $user);
-    }
-
-    public function supports(ParamConverter $configuration)
-    {
-        return $configuration->getName() === 'user';
+        return $user;
     }
 }
