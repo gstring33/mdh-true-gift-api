@@ -47,15 +47,10 @@ class AdminController extends AbstractController
     {
         /** @var User $user */
         $user = $request->attributes->get('user');
-        $hashedPassword = $passwordHasher->hashPassword(
-            $user,
-            $user->getPlainTextPassword()
-        );
-        $user->setPassword($hashedPassword);
         $em = $this->doctrine->getManager();
         $em->persist($user);
         $em->flush();
 
-        return $this->json(['message' => 'User created succesfully']);
+        return $this->json($user);
     }
 }
