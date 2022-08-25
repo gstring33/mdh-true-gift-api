@@ -3,6 +3,7 @@
 namespace App\Controller;
 
 use App\Entity\User;
+use App\Repository\UserRepository;
 use Doctrine\Persistence\ManagerRegistry;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -17,21 +18,29 @@ use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
 #[IsGranted('ROLE_ADMIN')]
 class AdminController extends AbstractController
 {
-    #[Route('/{uuid}', name: 'app_user_show', methods: ['GET'])]
-    public function show(int $uuid): JsonResponse
-    {
-        $data = [
-            'id' => $uuid,
-            'name' => 'John Doe'
-        ];
+    private ManagerRegistry $doctrine;
 
-        return $this->json($data);
+    public function __construct(ManagerRegistry $doctrine)
+    {
+        $this->doctrine = $doctrine;
     }
 
-    #[Route('/', name: 'app_admin_create_user', methods: ['POST'])]
+    #[Route('/user/{uuid}', name: 'app_admin_user_single', methods: ['GET'])]
+    #[ParamConverter('user', class: 'App\Request\ParamConverter\UserConverter')]
+    public function getOneByUuid(Request $request): JsonResponse
+    {
+        /** @var User $user */
+        $user = $request->attributes->get('user');
+        if (!$user) {
+            return $this->json(['message'=> 'No User Found'], 404);
+        }
+
+        return $this->json($user);
+    }
+
+    #[Route('/user', name: 'app_admin_create_user', methods: ['POST'])]
     #[ParamConverter('user', class: 'App\Request\ParamConverter\UserConverter')]
     public function createUser(
-        ManagerRegistry $doctrine,
         Request $request,
         UserPasswordHasherInterface $passwordHasher
     ): JsonResponse
@@ -43,14 +52,14 @@ class AdminController extends AbstractController
             $user->getPlainTextPassword()
         );
         $user->setPassword($hashedPassword);
-        $em = $doctrine->getManager();
+        $em = $this->doctrine->getManager();
         $em->persist($user);
         $em->flush();
 
         return $this->json(['User created succesfully']);
     }
 
-    #[Route('/{uuid}', name: 'app_admin_edit_user', methods: ['PUT'])]
+    #[Route('/user/{uuid}', name: 'app_admin_edit_user', methods: ['PUT'])]
     public function editUser(int $uuid): JsonResponse
     {
         $data = [

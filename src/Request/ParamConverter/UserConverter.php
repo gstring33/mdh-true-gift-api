@@ -20,11 +20,9 @@ class UserConverter implements ParamConverterInterface
 
     public function apply(Request $request, ParamConverter $configuration)
     {
-        if ($this->isNewCreatedUser($request)) {
-            $user = $this->convertNewUser($request);
-        } else {
-            $user = $this->convertExistingUser($request);
-        }
+        $user = $this->isNewCreatedUser($request) ?
+            $this->convertNewUser($request) :
+            $this->convertExistingUser($request);
 
         $request->attributes->set($configuration->getName(), $user);
     }
@@ -69,9 +67,9 @@ class UserConverter implements ParamConverterInterface
 
     /**
      * @param Request $request
-     * @return User
+     * @return User|null
      */
-    private function convertExistingUser (Request $request) : User
+    private function convertExistingUser (Request $request) : ?User
     {
         $uuid = $request->attributes->get('uuid');
         $user = $this->userRepository->findOneBy(['uuid' => $uuid]);
