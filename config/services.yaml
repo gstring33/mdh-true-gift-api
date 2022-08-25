@@ -28,3 +28,13 @@ services:
         arguments: [ '@request_stack' ]
         tags:
             - { name: kernel.event_listener, event: lexik_jwt_authentication.on_jwt_created, method: onJWTCreated }
+
+    App\Services\Mailer:
+        arguments:
+            $from: '%mailer_from%'
+            $host: '%mailer_host%'
+            $port: '%mailer_port%'
+            $username: '%mailer_username%'
+            $password: '%mailer_password%'
+            $debug_mode: '%mailer_debug_mode%'
+            $logger: '@logger'
