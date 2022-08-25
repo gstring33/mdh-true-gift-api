@@ -56,22 +56,6 @@ class AdminController extends AbstractController
         $em->persist($user);
         $em->flush();
 
-        return $this->json(['User created succesfully']);
-    }
-
-    #[Route('/user/{uuid}', name: 'app_admin_edit_user', methods: ['PUT'])]
-    public function editUser(int $uuid): JsonResponse
-    {
-        $data = [
-            'id' => $uuid,
-            'name' => 'John Doe'
-        ];
-        return $this->json($data);
-    }
-
-    #[Route('/{uuid}', name: 'app_user_delete', methods: ['DELETE'])]
-    public function delete(int $uuid): JsonResponse
-    {
-        return $this->json('User with id ' . $uuid . ' successfully deleted');
+        return $this->json(['message' => 'User created succesfully']);
     }
 }
