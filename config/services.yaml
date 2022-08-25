@@ -38,3 +38,6 @@ services:
             $password: '%mailer_password%'
             $debug_mode: '%mailer_debug_mode%'
             $logger: '@logger'
+
+    App\Normalizer\UserNormalizer:
+        tags: [serializer.normalizer]
