@@ -13,9 +13,9 @@ use Sensio\Bundle\FrameworkExtraBundle\Configuration\ParamConverter;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
 
 
-#[Route('/api/user', name: 'app_user')]
+#[Route('/api/admin', name: 'app_admin')]
 #[IsGranted('ROLE_ADMIN')]
-class UserController extends AbstractController
+class AdminController extends AbstractController
 {
     #[Route('/{uuid}', name: 'app_user_show', methods: ['GET'])]
     public function show(int $uuid): JsonResponse
@@ -28,9 +28,9 @@ class UserController extends AbstractController
         return $this->json($data);
     }
 
-    #[Route('/', name: 'app_user_create', methods: ['POST'])]
+    #[Route('/', name: 'app_admin_create_user', methods: ['POST'])]
     #[ParamConverter('user', class: 'App\Request\ParamConverter\UserConverter')]
-    public function create(
+    public function createUser(
         ManagerRegistry $doctrine,
         Request $request,
         UserPasswordHasherInterface $passwordHasher
@@ -50,8 +50,8 @@ class UserController extends AbstractController
         return $this->json(['User created succesfully']);
     }
 
-    #[Route('/{uuid}', name: 'app_user_edit', methods: ['PUT'])]
-    public function edit(int $uuid): JsonResponse
+    #[Route('/{uuid}', name: 'app_admin_edit_user', methods: ['PUT'])]
+    public function editUser(int $uuid): JsonResponse
     {
         $data = [
             'id' => $uuid,
