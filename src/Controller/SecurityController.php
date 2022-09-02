@@ -3,54 +3,62 @@
 namespace App\Controller;
 
 use App\Model\ChangePasswordModel;
+use App\Model\TokenMailModel;
 use App\Repository\UserRepository;
+use App\Services\Decoder;
 use Doctrine\Persistence\ManagerRegistry;
-use Karriere\JsonDecoder\JsonDecoder;
-use Lexik\Bundle\JWTAuthenticationBundle\Services\JWTTokenManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 use Symfony\Component\Routing\Annotation\Route;
-use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 
 class SecurityController extends AbstractController
 {
-    private TokenStorageInterface $tokenStorageInterface;
-    private JWTTokenManagerInterface $jwtManager;
     private UserRepository $userRepository;
     private ManagerRegistry $doctrine;
     private UserPasswordHasherInterface $passwordHasher;
+    private Decoder $decoder;
 
     public function __construct(
-        TokenStorageInterface $tokenStorageInterface,
-        JWTTokenManagerInterface $jwtManager,
         UserRepository $userRepository,
         ManagerRegistry $doctrine,
-        UserPasswordHasherInterface $passwordHasher
+        UserPasswordHasherInterface $passwordHasher,
+        Decoder $decoder
     ){
-        $this->tokenStorageInterface = $tokenStorageInterface;
-        $this->jwtManager = $jwtManager;
         $this->userRepository = $userRepository;
         $this->doctrine = $doctrine;
         $this->passwordHasher = $passwordHasher;
+        $this->decoder = $decoder;
     }
 
     #[Route('/api/change-password', name: 'app_security_change-password', methods: ['POST'])]
     public function changePassword(Request $request): JsonResponse
     {
-        $decodedJwtToken = $this->jwtManager->decode($this->tokenStorageInterface->getToken());
-        $user = $this->userRepository->findOneBy(['uuid' => $decodedJwtToken['uuid']]);
-        $jsonDecoder = new JsonDecoder();
+        $queryToken = $request->query->get('t');
+        if (!$queryToken) {
+            return $this->json(['error' => 'Invalid query'],400);
+        }
+        $decodedQueryToken = base64_decode($queryToken);
+        /** @var TokenMailModel $decodedData */
+        $decodedData = $this->decoder->jsonDecode($decodedQueryToken, TokenMailModel::class);
+        $now = date('Y-m-d H-m-s');
+        if ($now > $decodedData->exp) {
+            return $this->json(['error' => 'Date expired. You can not confirm your profil'],400);
+        }
+
         $data = $request->getContent();
         /** @var  ChangePasswordModel $changePasswordModel */
-        $changePasswordModel = $jsonDecoder->decode($data, ChangePasswordModel::class);
+        $changePasswordModel = $this->decoder->jsonDecode($data, ChangePasswordModel::class);
         if ($changePasswordModel->isNewPasswordValid()) {
-           $hashedPassword = $this->passwordHasher->hashPassword(
+            $user = $this->userRepository->findOneBy(['uuid' => $decodedData->uuid]);
+            $hashedPassword = $this->passwordHasher->hashPassword(
                 $user,
                 $changePasswordModel->newPassword
             );
             $user->setPassword($hashedPassword);
+            $user->setIsActive(1);
+            $user->setProfilConfirmationExpiresAt(null);
             $em = $this->doctrine->getManager();
             $em->persist($user);
             $em->flush();
