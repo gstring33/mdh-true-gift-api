@@ -51,9 +51,6 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\OneToOne(inversedBy: 'user', cascade: ['persist', 'remove'])]
     private ?GiftList $giftList = null;
 
-    #[ORM\Column(nullable: true)]
-    private ?\DateTimeImmutable $profilConfirmationExpiresAt = null;
-
     public function getId(): ?int
     {
         return $this->id;
@@ -215,18 +212,6 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     public function setGiftList(?GiftList $giftList): self
     {
         $this->giftList = $giftList;
-
-        return $this;
-    }
-
-    public function getProfilConfirmationExpiresAt(): ?\DateTimeImmutable
-    {
-        return $this->profilConfirmationExpiresAt;
-    }
-
-    public function setProfilConfirmationExpiresAt(?\DateTimeImmutable $profilConfirmationExpiresAt): self
-    {
-        $this->profilConfirmationExpiresAt = $profilConfirmationExpiresAt;
 
         return $this;
     }

@@ -38,7 +38,6 @@ security:
 
     access_control:
         - { path: ^/api/login, roles: PUBLIC_ACCESS }
-        - { path: ^/api/change-password, roles: PUBLIC_ACCESS }
         - { path: ^/api/admin, roles: [ROLE_ADMIN, IS_AUTHENTICATED_FULLY] }
         - { path: ^/api, roles: IS_AUTHENTICATED_FULLY }
 
