@@ -4,6 +4,7 @@ namespace App\Controller;
 
 use App\Entity\GiftList;
 use App\Entity\User;
+use App\Services\Mailer\MailerInterface;
 use Doctrine\Persistence\ManagerRegistry;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -39,7 +40,7 @@ class AdminController extends AbstractController
 
     #[Route('/user', name: 'app_admin_create_user', methods: ['POST'])]
     #[ParamConverter('user', class: 'App\Request\ParamConverter\UserConverter')]
-    public function createUser(Request $request,): JsonResponse
+    public function createUser(Request $request, MailerInterface $mailer): JsonResponse
     {
         /** @var User $user */
         $user = $request->attributes->get('user');
@@ -50,6 +51,12 @@ class AdminController extends AbstractController
         $em = $this->doctrine->getManager();
         $em->persist($user);
         $em->flush();
+
+        $mail =$mailer->send(
+            [$user->getEmail()],
+            'Herzliche Wilkommen bei True-Gift',
+            'Test'
+        );
 
         return $this->json($user);
     }

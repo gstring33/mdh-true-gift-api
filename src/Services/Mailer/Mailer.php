@@ -1,13 +1,14 @@
 <?php
 
-namespace App\Services;
+namespace App\Services\Mailer;
 
+use App\Services\PHPMailerService;
 use PHPMailer\PHPMailer\Exception;
 use PHPMailer\PHPMailer\PHPMailer;
 use PHPMailer\PHPMailer\SMTP;
 use Psr\Log\LoggerInterface;
 
-class Mailer
+class Mailer implements MailerInterface
 {
     /** @var PHPMailer */
     private $mailer;

@@ -14,7 +14,7 @@ services:
     # makes classes in src/ available to be used as services
     # this creates a service per class whose id is the fully-qualified class name
     App\:
-        resource: '../src/'
+        resource: '../src/*'
         exclude:
             - '../src/DependencyInjection/'
             - '../src/Entity/'
@@ -33,7 +33,7 @@ services:
         tags:
             - { name: kernel.event_listener, event: lexik_jwt_authentication.on_authentication_success, method: onAuthenticationSuccessResponse }
 
-    App\Services\Mailer:
+    App\Services\Mailer\Mailer:
         arguments:
             $from: '%mailer_from%'
             $host: '%mailer_host%'
@@ -42,6 +42,9 @@ services:
             $password: '%mailer_password%'
             $debug_mode: '%mailer_debug_mode%'
             $logger: '@logger'
+
+    App\Services\Mailer\MailerInterface:
+        alias: App\Services\Mailer\Mailer
 
     App\Normalizer\UserNormalizer:
         tags: [serializer.normalizer]
