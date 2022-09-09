@@ -32,6 +32,8 @@ class AuthenticationSuccessListener
             throw new \Exception('An error occured during the login system');
         }
         $data['isActive'] = $user->isActive();
+        $data['isAdmin'] = in_array('ROLE_ADMIN', $user->getRoles());
+        $data['uuid'] = $user->getUuid();
         $event->setData($data);
     }
 }
