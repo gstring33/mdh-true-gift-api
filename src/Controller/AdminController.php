@@ -2,7 +2,6 @@
 
 namespace App\Controller;
 
-use App\Entity\GiftList;
 use App\Entity\User;
 use App\Services\Mailer\MailerInterface;
 use Doctrine\Persistence\ManagerRegistry;
@@ -44,18 +43,24 @@ class AdminController extends AbstractController
     {
         /** @var User $user */
         $user = $request->attributes->get('user');
-        $list = new GiftList();
-        $list->setIsPublished(false);
-        $list->setUuid(uniqid('', false));
-        $user->setGiftList($list);
         $em = $this->doctrine->getManager();
         $em->persist($user);
         $em->flush();
 
-        $mail =$mailer->send(
+        $content = json_decode($request->getContent(), true);
+        $body = $this->renderView(
+            'emails/user_created.html.twig',
+            [
+                'email' => $user->getEmail(),
+                'firstname' => ucfirst($user->getFirstname()),
+                'password' => $content['password']
+            ]
+        );
+
+        $mailer->send(
             [$user->getEmail()],
             'Herzliche Wilkommen bei True-Gift',
-            'Test'
+            $body
         );
 
         return $this->json($user);

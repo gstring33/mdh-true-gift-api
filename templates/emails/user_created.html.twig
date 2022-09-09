@@ -1,0 +1,19 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Herzliche Wilkomen bei True-Gift{% endblock %}
+
+{% block body %}
+    <h1>Hallo {{ firstname }}!</h1>
+    <h2>Dein Profil wurde erfolgreich erstellt !</h2>
+    <p>Melde dich jetzt mit folgenden Zugangsdaten an: <p>
+        <ul>
+            <li>Benutzer: {{ email }}</li>
+            <li>Passwort (temporär): {{ password }}</li>
+        </ul>
+
+    <p>Wenn du dich zum ersten Mal anmeldest, wirst du aufgefordert, <b>das Passwort zu ändern</b>. Danach kannst du deine Wünsche in deiner Liste erstellen und die Person, der du dein Geschenk schenken sollst, ziehen.</p>
+
+    <p><a href= "{{ url ~ '/login'}}" type="button">Jetzt anmelden</a></p>
+
+    <p>Viel Spaß</p>
+{% endblock %}
