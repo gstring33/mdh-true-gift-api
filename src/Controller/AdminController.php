@@ -2,6 +2,7 @@
 
 namespace App\Controller;
 
+use App\Entity\GiftList;
 use App\Entity\User;
 use Doctrine\Persistence\ManagerRegistry;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -42,6 +43,10 @@ class AdminController extends AbstractController
     {
         /** @var User $user */
         $user = $request->attributes->get('user');
+        $list = new GiftList();
+        $list->setIsPublished(false);
+        $list->setUuid(uniqid('', false));
+        $user->setGiftList($list);
         $em = $this->doctrine->getManager();
         $em->persist($user);
         $em->flush();

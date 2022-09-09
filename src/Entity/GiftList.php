@@ -38,7 +38,7 @@ class GiftList
         return $this->id;
     }
 
-    public function isIsPublished(): ?bool
+    public function isPublished(): ?bool
     {
         return $this->isPublished;
     }
