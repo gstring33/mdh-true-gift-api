@@ -38,11 +38,11 @@ class AdminController extends AbstractController
     }
 
     #[Route('/user', name: 'app_admin_create_user', methods: ['POST'])]
-    #[ParamConverter('user', class: 'App\Request\ParamConverter\UserConverter')]
+    #[ParamConverter('new-user', class: 'App\Request\ParamConverter\UserConverter')]
     public function createUser(Request $request, MailerInterface $mailer): JsonResponse
     {
         /** @var User $user */
-        $user = $request->attributes->get('user');
+        $user = $request->attributes->get('new-user');
         $em = $this->doctrine->getManager();
         $em->persist($user);
         $em->flush();

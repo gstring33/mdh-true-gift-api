@@ -12,7 +12,7 @@ use Sensio\Bundle\FrameworkExtraBundle\Request\ParamConverter\ParamConverterInte
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 
-class UserConverter implements ParamConverterInterface
+class NewUserConverter implements ParamConverterInterface
 {
     private UserRepository $userRepository;
     private Decoder $decoder;
@@ -30,23 +30,44 @@ class UserConverter implements ParamConverterInterface
 
     public function apply(Request $request, ParamConverter $configuration)
     {
-        $user = $this->convertExistingUser($request);
+        $user = $this->convertNewUser($request);
         $request->attributes->set($configuration->getName(), $user);
     }
 
     public function supports(ParamConverter $configuration)
     {
-        return $configuration->getName() === 'user';
+        return $configuration->getName() === 'new-user';
     }
 
     /**
      * @param Request $request
-     * @return User|null
+     * @return User
      */
-    private function convertExistingUser (Request $request) : ?User
+    private function convertNewUser (Request $request) : User
     {
-        $uuid = $request->attributes->get('uuid');
-        $user = $this->userRepository->findOneBy(['uuid' => $uuid]);
+        /** @var UserModel $userModel */
+        $userModel = $this->decoder->jsonDecode($request->getContent(), UserModel::class);
+
+        $list = (new GiftList())
+            ->setUuid(uniqid('', false))
+            ->setIsPublished(0);
+
+        $user = (new User())
+            ->setFirstname($userModel->firstname)
+            ->setLastname($userModel->lastname)
+            ->setEmail($userModel->email)
+            ->setIsActive(0)
+            ->setUuid(uniqid('', false))
+            ->setGiftList($list);
+
+        $hashedPassword = $this->passwordHasher->hashPassword(
+            $user,
+            $userModel->password
+        );
+        $user->setPassword($hashedPassword);
+
+        $roles = !isset($userModel->roles) ? ['ROLE_USER'] : $userModel->roles;
+        $user->setRoles($roles);
 
         return $user;
     }
