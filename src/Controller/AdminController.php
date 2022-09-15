@@ -3,6 +3,7 @@
 namespace App\Controller;
 
 use App\Entity\User;
+use App\Repository\UserRepository;
 use App\Services\Mailer\MailerInterface;
 use Doctrine\Persistence\ManagerRegistry;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -18,10 +19,23 @@ use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
 class AdminController extends AbstractController
 {
     private ManagerRegistry $doctrine;
+    private UserRepository $userRepository;
 
-    public function __construct(ManagerRegistry $doctrine)
+    public function __construct(ManagerRegistry $doctrine, UserRepository $userRepository)
     {
         $this->doctrine = $doctrine;
+        $this->userRepository = $userRepository;
+    }
+    #[Route('/user', name: 'app_admin_all_user', methods: ['GET'])]
+    public function getAll()
+    {
+        $users = $this->userRepository->findAll();
+
+        if (!$users) {
+            return $this->json(['message'=> 'User list not Found'], 404);
+        }
+
+        return $this->json($users);
     }
 
     #[Route('/user/{uuid}', name: 'app_admin_user_single', methods: ['GET'])]
