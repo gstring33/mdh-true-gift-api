@@ -5,6 +5,8 @@ namespace App\Controller;
 use App\Entity\Gift;
 use App\Repository\UserRepository;
 use Doctrine\Persistence\ManagerRegistry;
+use JMS\Serializer\SerializationContext;
+use JMS\Serializer\SerializerInterface;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\ParamConverter;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -48,7 +50,7 @@ class GiftController extends AbstractController
 
     #[Route('', name: 'app_gift_create', methods: ['POST'])]
     #[ParamConverter('new-gift', class: 'App\Request\ParamConverter\NewGiftConverter')]
-    public function createGift(Request $request): JsonResponse
+    public function createGift(Request $request, SerializerInterface $serializer): JsonResponse
     {
         /** @var Gift $gift */
         $gift = $request->attributes->get('new-gift');
@@ -66,8 +68,8 @@ class GiftController extends AbstractController
         $em->persist($gift);
         $em->flush();
 
-        // TODO: fix circular reference with groups
-        return $this->json(['Success']);
+        $json = $serializer->serialize($gift, 'json', SerializationContext::create()->setGroups(['gift']));
+        return new JsonResponse($json, 200, [], true);
     }
 
     #[Route('/{uuid}', name: 'app_gift_edit', methods: ['PUT'])]

@@ -5,6 +5,7 @@ namespace App\Entity;
 use App\Repository\GiftRepository;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
+use JMS\Serializer\Annotation\Groups;
 
 #[ORM\Entity(repositoryClass: GiftRepository::class)]
 class Gift
@@ -15,12 +16,15 @@ class Gift
     private ?int $id = null;
 
     #[ORM\Column(length: 255)]
+    #[Groups(groups: ['title' => 'gift'])]
     private ?string $title = null;
 
     #[ORM\Column(type: Types::TEXT)]
+    #[Groups(groups: ['description' => 'gift'])]
     private ?string $description = null;
 
     #[ORM\Column(length: 255, nullable: true)]
+    #[Groups(groups: ['link' => 'gift'])]
     private ?string $link = null;
 
     #[ORM\ManyToOne(inversedBy: 'Gifts')]
@@ -28,6 +32,7 @@ class Gift
     private ?GiftList $giftList = null;
 
     #[ORM\Column(length: 255)]
+    #[Groups(groups: ['uuid' => 'gift'])]
     private ?string $uuid = null;
 
     public function getId(): ?int
