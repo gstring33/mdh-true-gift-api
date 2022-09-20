@@ -27,18 +27,21 @@ class GiftController extends AbstractController
     private JWTTokenManagerInterface $jwtManager;
     private TokenStorageInterface $tokenStorage;
     private UserRepository $userRepository;
+    private ValidatorInterface $validator;
 
     public function __construct(
         ManagerRegistry $doctrine,
         JWTTokenManagerInterface $jwtManager,
         TokenStorageInterface $tokenStorage,
-        UserRepository $userRepository
+        UserRepository $userRepository,
+        ValidatorInterface $validator
 
     ) {
         $this->doctrine = $doctrine;
         $this->jwtManager = $jwtManager;
         $this->tokenStorage = $tokenStorage;
         $this->userRepository = $userRepository;
+        $this->validator = $validator;
     }
 
     #[Route('/', name: 'app_gift_all', methods: ['GET'])]
@@ -49,8 +52,11 @@ class GiftController extends AbstractController
 
     #[Route('', name: 'app_gift_create', methods: ['POST'])]
     #[ParamConverter('new-gift', class: 'App\Request\ParamConverter\NewGiftConverter')]
-    public function createGift(Request $request, SerializerInterface $serializer): JsonResponse
-    {
+    public function createGift(
+        Request $request,
+        SerializerInterface $serializer,
+        ValidatorInterface $validator
+    ): JsonResponse {
         /** @var Gift $gift */
         $gift = $request->attributes->get('new-gift');
         $decodedJwtToken = $this->jwtManager->decode($this->tokenStorage->getToken());
@@ -63,6 +69,12 @@ class GiftController extends AbstractController
 
         $list = $currentUser->getGiftList();
         $gift->setGiftList($list);
+
+        $error = $this->validateGift($gift);
+        if (!empty($error)) {
+            return $this->json($error, 400);
+        }
+
         $em = $this->doctrine->getManager();
         $em->persist($gift);
         $em->flush();
@@ -93,9 +105,9 @@ class GiftController extends AbstractController
             ->setDescription($giftModel->description)
             ->setLink($giftModel->link);
 
-        $errors = $validator->validate($gift);
-        if (count($errors) > 0) {
-            return $this->json(['error' => $errors[0]->getMessage()], 400);
+        $error = $this->validateGift($gift);
+        if (!empty($error)) {
+            return $this->json($error, 400);
         }
 
         $em = $this->doctrine->getManager();
@@ -110,5 +122,14 @@ class GiftController extends AbstractController
     public function delete(int $uuid): JsonResponse
     {
         return $this->json('Gift with id ' . $uuid . ' successfully deleted');
+    }
+
+    private function validateGift(Gift $gift)
+    {
+        $errors = $this->validator->validate($gift);
+        if (count($errors) > 0) {
+            return ['error' => $errors[0]->getMessage()];
+        }
+        return [];
     }
 }
