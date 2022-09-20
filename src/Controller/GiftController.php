@@ -3,7 +3,9 @@
 namespace App\Controller;
 
 use App\Entity\Gift;
+use App\Model\GiftModel;
 use App\Repository\UserRepository;
+use App\Services\Decoder;
 use Doctrine\Persistence\ManagerRegistry;
 use JMS\Serializer\SerializationContext;
 use JMS\Serializer\SerializerInterface;
@@ -73,13 +75,29 @@ class GiftController extends AbstractController
     }
 
     #[Route('/{uuid}', name: 'app_gift_edit', methods: ['PUT'])]
-    public function edit(int $uuid): JsonResponse
+    #[ParamConverter('gift', class: 'App\Request\ParamConverter\GiftConverter')]
+    public function edit(Request $request, SerializerInterface $serializer, Decoder $decoder): JsonResponse
     {
-        $data = [
-            'id' => $uuid,
-            'name' => 'A new Book'
-        ];
-        return $this->json($data);
+        /** @var Gift $gift */
+        $gift = $request->attributes->get('gift');
+
+        if (!$gift) {
+            return $this->json(['message'=> 'No Gift Found'], 404);
+        }
+
+        $data = $request->getContent();
+        $giftModel = $decoder->jsonDecode($data, GiftModel::class);
+        $gift
+            ->setTitle($giftModel->title)
+            ->setDescription($giftModel->description)
+            ->setLink($giftModel->link);
+
+        $em = $this->doctrine->getManager();
+        $em->persist($gift);
+        $em->flush();
+
+        $json = $serializer->serialize($gift, 'json', SerializationContext::create()->setGroups(['gift']));
+        return new JsonResponse($json, 200, [], true);
     }
 
     #[Route('/{uuid}', name: 'app_gift_delete', methods: ['DELETE'])]
