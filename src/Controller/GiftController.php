@@ -16,6 +16,8 @@ use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\HttpFoundation\Request;
 use Lexik\Bundle\JWTAuthenticationBundle\Services\JWTTokenManagerInterface;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
+use Symfony\Component\Validator\ConstraintViolation;
+use Symfony\Component\Validator\Validator\ValidatorInterface;
 
 
 #[Route('/api/gift', name: 'app_gift')]
@@ -39,15 +41,10 @@ class GiftController extends AbstractController
         $this->userRepository = $userRepository;
     }
 
-    #[Route('/{uuid}', name: 'app_gift_show', methods: ['GET'])]
-    public function show(int $uuid): JsonResponse
+    #[Route('/', name: 'app_gift_all', methods: ['GET'])]
+    #[ParamConverter('gift', class: 'App\Request\ParamConverter\GiftConverter')]
+    public function all(): JsonResponse
     {
-        $data = [
-            'id' => $uuid,
-            'title' => 'A Book'
-        ];
-
-        return $this->json($data);
     }
 
     #[Route('', name: 'app_gift_create', methods: ['POST'])]
@@ -76,8 +73,12 @@ class GiftController extends AbstractController
 
     #[Route('/{uuid}', name: 'app_gift_edit', methods: ['PUT'])]
     #[ParamConverter('gift', class: 'App\Request\ParamConverter\GiftConverter')]
-    public function edit(Request $request, SerializerInterface $serializer, Decoder $decoder): JsonResponse
-    {
+    public function edit(
+        Request $request,
+        SerializerInterface $serializer,
+        Decoder $decoder,
+        ValidatorInterface $validator
+    ): JsonResponse {
         /** @var Gift $gift */
         $gift = $request->attributes->get('gift');
 
@@ -91,6 +92,11 @@ class GiftController extends AbstractController
             ->setTitle($giftModel->title)
             ->setDescription($giftModel->description)
             ->setLink($giftModel->link);
+
+        $errors = $validator->validate($gift);
+        if (count($errors) > 0) {
+            return $this->json(['error' => $errors[0]->getMessage()], 400);
+        }
 
         $em = $this->doctrine->getManager();
         $em->persist($gift);
