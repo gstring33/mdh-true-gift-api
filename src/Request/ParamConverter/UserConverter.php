@@ -2,9 +2,7 @@
 
 namespace App\Request\ParamConverter;
 
-use App\Entity\GiftList;
 use App\Entity\User;
-use App\Model\UserModel;
 use App\Repository\UserRepository;
 use App\Services\Decoder;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\ParamConverter;
@@ -15,17 +13,10 @@ use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 class UserConverter implements ParamConverterInterface
 {
     private UserRepository $userRepository;
-    private Decoder $decoder;
-    private UserPasswordHasherInterface $passwordHasher;
 
-    public function __construct(
-        UserRepository $userRepository,
-        Decoder $decoder,
-        UserPasswordHasherInterface $passwordHasher)
+    public function __construct(UserRepository $userRepository)
     {
         $this->userRepository = $userRepository;
-        $this->decoder = $decoder;
-        $this->passwordHasher = $passwordHasher;
     }
 
     public function apply(Request $request, ParamConverter $configuration)
