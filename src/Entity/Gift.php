@@ -16,15 +16,15 @@ class Gift
     private ?int $id = null;
 
     #[ORM\Column(length: 255)]
-    #[Groups(groups: ['title' => 'gift'])]
+    #[Groups(groups: ['title' => 'gift','list'])]
     private ?string $title = null;
 
     #[ORM\Column(type: Types::TEXT)]
-    #[Groups(groups: ['description' => 'gift'])]
+    #[Groups(groups: ['description' => 'gift','list'])]
     private ?string $description = null;
 
     #[ORM\Column(length: 255, nullable: true)]
-    #[Groups(groups: ['link' => 'gift'])]
+    #[Groups(groups: ['link' => 'gift', 'list'])]
     private ?string $link = null;
 
     #[ORM\ManyToOne(inversedBy: 'Gifts')]
@@ -32,7 +32,7 @@ class Gift
     private ?GiftList $giftList = null;
 
     #[ORM\Column(length: 255)]
-    #[Groups(groups: ['uuid' => 'gift'])]
+    #[Groups(groups: ['uuid' => 'gift', 'list'])]
     private ?string $uuid = null;
 
     public function getId(): ?int

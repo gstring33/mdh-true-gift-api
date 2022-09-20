@@ -4,6 +4,7 @@ namespace App\Controller;
 
 use App\Entity\Gift;
 use App\Model\GiftModel;
+use App\Repository\GiftRepository;
 use App\Repository\UserRepository;
 use App\Services\Decoder;
 use Doctrine\Persistence\ManagerRegistry;
@@ -16,7 +17,6 @@ use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\HttpFoundation\Request;
 use Lexik\Bundle\JWTAuthenticationBundle\Services\JWTTokenManagerInterface;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
-use Symfony\Component\Validator\ConstraintViolation;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
 
 
@@ -27,6 +27,7 @@ class GiftController extends AbstractController
     private JWTTokenManagerInterface $jwtManager;
     private TokenStorageInterface $tokenStorage;
     private UserRepository $userRepository;
+    private GiftRepository $giftRepository;
     private ValidatorInterface $validator;
 
     public function __construct(
@@ -34,6 +35,7 @@ class GiftController extends AbstractController
         JWTTokenManagerInterface $jwtManager,
         TokenStorageInterface $tokenStorage,
         UserRepository $userRepository,
+        GiftRepository $giftRepository,
         ValidatorInterface $validator
 
     ) {
@@ -41,13 +43,20 @@ class GiftController extends AbstractController
         $this->jwtManager = $jwtManager;
         $this->tokenStorage = $tokenStorage;
         $this->userRepository = $userRepository;
+        $this->giftRepository = $giftRepository;
         $this->validator = $validator;
     }
 
-    #[Route('/', name: 'app_gift_all', methods: ['GET'])]
+    #[Route('/list', name: 'app_gift_all', methods: ['GET'])]
     #[ParamConverter('gift', class: 'App\Request\ParamConverter\GiftConverter')]
-    public function all(): JsonResponse
+    public function all(SerializerInterface $serializer): JsonResponse
     {
+        $decodedJwtToken = $this->jwtManager->decode($this->tokenStorage->getToken());
+        $uuid = $decodedJwtToken['uuid'];
+        $currentUser = $this->userRepository->findOneBy(['uuid' => $uuid]);
+        $list = $currentUser->getGiftList()->getGifts();
+        $json = $serializer->serialize($list->toArray(), 'json', SerializationContext::create()->setGroups(['list']));
+        return new JsonResponse($json, 200, [], true);
     }
 
     #[Route('', name: 'app_gift_create', methods: ['POST'])]
