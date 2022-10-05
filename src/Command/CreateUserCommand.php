@@ -14,17 +14,17 @@ use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 #[AsCommand(
     name: 'app:create-user',
     description: 'Creates a new user.',
-    hidden: false,
-    aliases: ['app:add-user']
+    aliases: ['app:add-user'],
+    hidden: false
 )]
 class CreateUserCommand extends Command
 {
     private UserPasswordHasherInterface $passwordHasher;
     private ManagerRegistry $doctrine;
 
-    public function __construct(string $name = null, UserPasswordHasherInterface $passwordHasher, ManagerRegistry $doctrine)
+    public function __construct(UserPasswordHasherInterface $passwordHasher, ManagerRegistry $doctrine)
     {
-        parent::__construct($name);
+        parent::__construct('app:create-user');
         $this->passwordHasher = $passwordHasher;
         $this->doctrine = $doctrine;
     }

@@ -8,6 +8,7 @@ use Doctrine\Persistence\ManagerRegistry;
 use Symfony\Component\Security\Core\Exception\UnsupportedUserException;
 use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
 use Symfony\Component\Security\Core\User\PasswordUpgraderInterface;
+use function Doctrine\ORM\QueryBuilder;
 
 /**
  * @extends ServiceEntityRepository<User>
@@ -56,6 +57,33 @@ class UserRepository extends ServiceEntityRepository implements PasswordUpgrader
         $this->add($user, true);
     }
 
+    public function selectPartner (User $user)
+    {
+        if ($user->getOfferGiftTo() !== null) {
+            return null;
+        }
+
+        $builder = $this->createQueryBuilder('u');
+        $users = $builder
+            ->where('u.uuid != :uuid')
+            ->setParameter('uuid', $user->getUuid())
+            ->andWhere($builder->expr()->isNull('u.recieveGiftFrom'))
+            ->getQuery()
+            ->getResult();
+
+        $totalUsers =  count($users);
+
+        if ($totalUsers === 0) {
+            return null;
+        }
+
+        if ($totalUsers === 2) {
+            // TODO: return Partner who did not previously select me
+        }
+
+        $key = array_rand($users);
+        return $users[$key];
+    }
 //    /**
 //     * @return User[] Returns an array of User objects
 //     */

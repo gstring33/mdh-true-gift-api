@@ -63,8 +63,7 @@ class GiftController extends AbstractController
     #[ParamConverter('new-gift', class: 'App\Request\ParamConverter\NewGiftConverter')]
     public function createGift(
         Request $request,
-        SerializerInterface $serializer,
-        ValidatorInterface $validator
+        SerializerInterface $serializer
     ): JsonResponse {
         /** @var Gift $gift */
         $gift = $request->attributes->get('new-gift');
