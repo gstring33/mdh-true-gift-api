@@ -59,6 +59,19 @@ class GiftController extends AbstractController
         return new JsonResponse($json, 200, [], true);
     }
 
+    #[Route('/partner/list', name: 'app_gift_all_from_partner', methods: ['GET'])]
+    #[ParamConverter('gift', class: 'App\Request\ParamConverter\GiftConverter')]
+    public function allFromPartner(SerializerInterface $serializer): JsonResponse
+    {
+        $decodedJwtToken = $this->jwtManager->decode($this->tokenStorage->getToken());
+        $uuid = $decodedJwtToken['uuid'];
+        $currentUser = $this->userRepository->findOneBy(['uuid' => $uuid]);
+        $partner = $currentUser->getOfferGiftTo();
+        $list =$partner->getGiftList()->getGifts();
+        $json = $serializer->serialize($list->toArray(), 'json', SerializationContext::create()->setGroups(['list']));
+        return new JsonResponse($json, 200, [], true);
+    }
+
     #[Route('', name: 'app_gift_create', methods: ['POST'])]
     #[ParamConverter('new-gift', class: 'App\Request\ParamConverter\NewGiftConverter')]
     public function createGift(
