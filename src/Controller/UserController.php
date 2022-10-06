@@ -3,66 +3,60 @@
 namespace App\Controller;
 
 use App\Entity\User;
+use App\Repository\UserRepository;
 use Doctrine\Persistence\ManagerRegistry;
+use Lexik\Bundle\JWTAuthenticationBundle\Services\JWTTokenManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
-use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 use Symfony\Component\Routing\Annotation\Route;
-use Sensio\Bundle\FrameworkExtraBundle\Configuration\ParamConverter;
-use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
+use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 
 
-#[Route('/api/user', name: 'app_user')]
-#[IsGranted('ROLE_ADMIN')]
+#[Route('/api/user', name: 'app_user', methods:['POST'])]
 class UserController extends AbstractController
 {
-    #[Route('/{uuid}', name: 'app_user_show', methods: ['GET'])]
-    public function show(int $uuid): JsonResponse
-    {
-        $data = [
-            'id' => $uuid,
-            'name' => 'John Doe'
-        ];
+    private JWTTokenManagerInterface $jwtManager;
+    private TokenStorageInterface $tokenStorage;
+    private UserRepository $userRepository;
+    private ManagerRegistry $doctrine;
 
-        return $this->json($data);
+
+    public function __construct(
+        ManagerRegistry $doctrine,
+        JWTTokenManagerInterface $jwtManager,
+        TokenStorageInterface $tokenStorage,
+        UserRepository $userRepository,
+    ) {
+        $this->jwtManager = $jwtManager;
+        $this->tokenStorage = $tokenStorage;
+        $this->userRepository = $userRepository;
+        $this->doctrine = $doctrine;
     }
 
-    #[Route('/', name: 'app_user_create', methods: ['POST'])]
-    #[ParamConverter('user', class: 'App\Request\ParamConverter\UserConverter')]
-    public function create(
-        ManagerRegistry $doctrine,
-        Request $request,
-        UserPasswordHasherInterface $passwordHasher
-    ): JsonResponse
+    #[Route('/select-partner', name: 'app_user_select')]
+    public function select(): JsonResponse
     {
-        /** @var User $user */
-        $user = $request->attributes->get('user');
-        $hashedPassword = $passwordHasher->hashPassword(
-            $user,
-            $user->getPlainTextPassword()
-        );
-        $user->setPassword($hashedPassword);
-        $em = $doctrine->getManager();
-        $em->persist($user);
+        $decodedJwtToken = $this->jwtManager->decode($this->tokenStorage->getToken());
+        $uuid = $decodedJwtToken['uuid'];
+        $currentUser = $this->userRepository->findOneBy(['uuid' => $uuid]);
+
+        if (!$currentUser || !$currentUser->isActive()) {
+            return $this->json(['message'=> 'User not found or inactive'], 404);
+        }
+
+        /** @var User|null $partner */
+        $partner = $this->userRepository->selectPartner($currentUser);
+        if ($partner == null) {
+            return $this->json(['message' => 'No user selected'], 400);
+        }
+
+        $currentUser->setOfferGiftTo($partner);
+        $partner->setRecieveGiftFrom($currentUser);
+        $em = $this->doctrine->getManager();
+        $em->persist($currentUser);
+        $em->persist($partner);
         $em->flush();
 
-        return $this->json(['User created succesfully']);
-    }
-
-    #[Route('/{uuid}', name: 'app_user_edit', methods: ['PUT'])]
-    public function edit(int $uuid): JsonResponse
-    {
-        $data = [
-            'id' => $uuid,
-            'name' => 'John Doe'
-        ];
-        return $this->json($data);
-    }
-
-    #[Route('/{uuid}', name: 'app_user_delete', methods: ['DELETE'])]
-    public function delete(int $uuid): JsonResponse
-    {
-        return $this->json('User with id ' . $uuid . ' successfully deleted');
+        return $this->json($partner);
     }
 }

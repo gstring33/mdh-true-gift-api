@@ -12,6 +12,11 @@ framework:
         cookie_samesite: lax
         storage_factory_id: session.storage.factory.native
 
+    validation:
+        mapping:
+            paths:
+                - "%kernel.project_dir%/config/validator/"
+
     #esi: true
     #fragments: true
     php_errors:

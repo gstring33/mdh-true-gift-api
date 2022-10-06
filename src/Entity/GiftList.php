@@ -5,8 +5,8 @@ namespace App\Entity;
 use App\Repository\GiftListRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
-use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
+use JMS\Serializer\Annotation\Groups;
 
 #[ORM\Entity(repositoryClass: GiftListRepository::class)]
 class GiftList
@@ -23,6 +23,7 @@ class GiftList
     private ?User $user = null;
 
     #[ORM\OneToMany(mappedBy: 'giftList', targetEntity: Gift::class, orphanRemoval: true)]
+    #[Groups(groups: ['gifts' => 'list'])]
     private Collection $Gifts;
 
     #[ORM\Column(length: 255)]
@@ -38,7 +39,7 @@ class GiftList
         return $this->id;
     }
 
-    public function isIsPublished(): ?bool
+    public function isPublished(): ?bool
     {
         return $this->isPublished;
     }

@@ -1,0 +1,8 @@
+App\Entity\Gift:
+  properties:
+    title:
+      - NotBlank: {message: 'Der Titel muss ausgefüllt werden'}
+    description:
+      - NotBlank: {message: 'Eine Beschreibung muss ausgefüllt werden'}
+    link:
+      - Url: {message: 'Die URL {{ value }} is keine gultige URL'}

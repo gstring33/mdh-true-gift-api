@@ -8,6 +8,7 @@ use Doctrine\Persistence\ManagerRegistry;
 use Symfony\Component\Security\Core\Exception\UnsupportedUserException;
 use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
 use Symfony\Component\Security\Core\User\PasswordUpgraderInterface;
+use function Doctrine\ORM\QueryBuilder;
 
 /**
  * @extends ServiceEntityRepository<User>
@@ -56,28 +57,35 @@ class UserRepository extends ServiceEntityRepository implements PasswordUpgrader
         $this->add($user, true);
     }
 
-//    /**
-//     * @return User[] Returns an array of User objects
-//     */
-//    public function findByExampleField($value): array
-//    {
-//        return $this->createQueryBuilder('u')
-//            ->andWhere('u.exampleField = :val')
-//            ->setParameter('val', $value)
-//            ->orderBy('u.id', 'ASC')
-//            ->setMaxResults(10)
-//            ->getQuery()
-//            ->getResult()
-//        ;
-//    }
+    public function selectPartner (User $currentUser)
+    {
+        if ($currentUser->getOfferGiftTo() !== null) {
+            return null;
+        }
 
-//    public function findOneBySomeField($value): ?User
-//    {
-//        return $this->createQueryBuilder('u')
-//            ->andWhere('u.exampleField = :val')
-//            ->setParameter('val', $value)
-//            ->getQuery()
-//            ->getOneOrNullResult()
-//        ;
-//    }
+        $builder = $this->createQueryBuilder('u');
+        $users = $builder
+            ->where('u.uuid != :uuid')
+            ->setParameter('uuid', $currentUser->getUuid())
+            ->andWhere($builder->expr()->isNull('u.recieveGiftFrom'))
+            ->getQuery()
+            ->getResult();
+
+        $totalUsers =  count($users);
+
+        if ($totalUsers === 0) {
+            return null;
+        }
+
+        if ($totalUsers === 2) {
+            $userSelected = array_filter($users, function (User $u) use ($currentUser) {
+                return $u->getOfferGiftTo() !== $currentUser;
+            });
+            if (count($userSelected) === 1) {
+                return $userSelected[0];
+            }
+        }
+        $key = array_rand($users);
+        return $users[$key];
+    }
 }

@@ -1,0 +1,4 @@
+services:
+
+  App\Services\Mailer\MailerInterface:
+    alias: App\Services\Mailer\MailerMock
