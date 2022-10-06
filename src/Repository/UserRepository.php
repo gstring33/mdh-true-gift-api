@@ -57,16 +57,16 @@ class UserRepository extends ServiceEntityRepository implements PasswordUpgrader
         $this->add($user, true);
     }
 
-    public function selectPartner (User $user)
+    public function selectPartner (User $currentUser)
     {
-        if ($user->getOfferGiftTo() !== null) {
+        if ($currentUser->getOfferGiftTo() !== null) {
             return null;
         }
 
         $builder = $this->createQueryBuilder('u');
         $users = $builder
             ->where('u.uuid != :uuid')
-            ->setParameter('uuid', $user->getUuid())
+            ->setParameter('uuid', $currentUser->getUuid())
             ->andWhere($builder->expr()->isNull('u.recieveGiftFrom'))
             ->getQuery()
             ->getResult();
@@ -78,34 +78,14 @@ class UserRepository extends ServiceEntityRepository implements PasswordUpgrader
         }
 
         if ($totalUsers === 2) {
-            // TODO: return Partner who did not previously select me
+            $userSelected = array_filter($users, function (User $u) use ($currentUser) {
+                return $u->getOfferGiftTo() !== $currentUser;
+            });
+            if (count($userSelected) === 1) {
+                return $userSelected[0];
+            }
         }
-
         $key = array_rand($users);
         return $users[$key];
     }
-//    /**
-//     * @return User[] Returns an array of User objects
-//     */
-//    public function findByExampleField($value): array
-//    {
-//        return $this->createQueryBuilder('u')
-//            ->andWhere('u.exampleField = :val')
-//            ->setParameter('val', $value)
-//            ->orderBy('u.id', 'ASC')
-//            ->setMaxResults(10)
-//            ->getQuery()
-//            ->getResult()
-//        ;
-//    }
-
-//    public function findOneBySomeField($value): ?User
-//    {
-//        return $this->createQueryBuilder('u')
-//            ->andWhere('u.exampleField = :val')
-//            ->setParameter('val', $value)
-//            ->getQuery()
-//            ->getOneOrNullResult()
-//        ;
-//    }
 }
