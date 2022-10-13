@@ -51,7 +51,7 @@ final class Version20220825130750 extends AbstractMigration
                 offer_gift_to_id INT DEFAULT NULL,
                 gift_list_id INT DEFAULT NULL,
                 uuid VARCHAR(180) NOT NULL,
-                roles JSON NOT NULL,
+                roles LONGTEXT NOT NULL,
                 password VARCHAR(255) NOT NULL,
                 firstname VARCHAR(50) NOT NULL,
                 lastname VARCHAR(50) NOT NULL,
