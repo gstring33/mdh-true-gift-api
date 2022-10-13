@@ -31,7 +31,7 @@ final class Version20220825130750 extends AbstractMigration
                 INDEX IDX_A47C990D51F42524 (gift_list_id), 
                 PRIMARY KEY(id)) 
             DEFAULT CHARACTER 
-            SET utf8 
+            SET utf8mb4 
             COLLATE `utf8mb4_unicode_ci` ENGINE = InnoDB'
         );
         $this->addSql('
@@ -41,7 +41,7 @@ final class Version20220825130750 extends AbstractMigration
                 uuid VARCHAR(255) NOT NULL, 
                 PRIMARY KEY(id)) 
             DEFAULT CHARACTER 
-            SET utf8 
+            SET utf8mb4 
             COLLATE `utf8mb4_unicode_ci` ENGINE = InnoDB'
         );
         $this->addSql('
@@ -65,7 +65,7 @@ final class Version20220825130750 extends AbstractMigration
                 UNIQUE INDEX UNIQ_8D93D64951F42524 (gift_list_id), 
                 PRIMARY KEY(id))
             DEFAULT CHARACTER 
-            SET utf8 
+            SET utf8mb4 
             COLLATE `utf8mb4_unicode_ci` ENGINE = InnoDB'
         );
         $this->addSql('ALTER TABLE gift ADD CONSTRAINT FK_A47C990D51F42524 FOREIGN KEY (gift_list_id) REFERENCES gift_list (id)');
