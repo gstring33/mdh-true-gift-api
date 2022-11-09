@@ -57,8 +57,11 @@ class DashboardController extends AbstractController
         $uuid = $decodedJwtToken['uuid'];
         $currentUser = $this->userRepository->findOneBy(['uuid' => $uuid]);
         $users = $this->userRepository->findAllOtherUsers($currentUser);
-
-        $json = $serializer->serialize($users, 'json', SerializationContext::create()->setGroups(['dashboard_users']));
+        $dashboard = [
+            'total' => count($users),
+            'users' => $users
+        ];
+        $json = $serializer->serialize($dashboard, 'json', SerializationContext::create()->setGroups(['dashboard_users']));
         return new JsonResponse($json, 200, [], true);
     }
 }
