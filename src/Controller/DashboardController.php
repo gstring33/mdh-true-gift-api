@@ -49,4 +49,16 @@ class DashboardController extends AbstractController
         $json = $serializer->serialize($currentUser, 'json', SerializationContext::create()->setGroups(['dashboard']));
         return new JsonResponse($json, 200, [], true);
     }
+
+    #[Route('/api/dashboard/users', name: 'app_dashboard_users', methods: ['GET'])]
+    public function allUsers(SerializerInterface $serializer): JsonResponse
+    {
+        $decodedJwtToken = $this->jwtManager->decode($this->tokenStorage->getToken());
+        $uuid = $decodedJwtToken['uuid'];
+        $currentUser = $this->userRepository->findOneBy(['uuid' => $uuid]);
+        $users = $this->userRepository->findAllOtherUsers($currentUser);
+
+        $json = $serializer->serialize($users, 'json', SerializationContext::create()->setGroups(['dashboard_users']));
+        return new JsonResponse($json, 200, [], true);
+    }
 }

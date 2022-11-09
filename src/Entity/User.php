@@ -18,7 +18,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     private ?int $id = null;
 
     #[ORM\Column(length: 180, unique: true)]
-    #[Groups(groups: ['firstname' => 'admin'])]
+    #[Groups(groups: ['firstname' => 'admin', 'dashboard_users'])]
     private ?string $uuid = null;
 
     #[ORM\Column]
@@ -32,15 +32,16 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     private ?string $password = null;
 
     #[ORM\Column(length: 50)]
-    #[Groups(groups: ['firstname' => 'dashboard', 'admin'])]
+    #[Groups(groups: ['firstname' => 'dashboard', 'admin', 'dashboard_users'])]
     private ?string $firstname = null;
 
     #[ORM\Column(length: 50)]
-    #[Groups(groups: ['lastname' => 'dashboard', 'admin'])]
+    #[Groups(groups: ['lastname' => 'dashboard', 'admin', 'dashboard_users'])]
     private ?string $lastname = null;
 
     #[ORM\Column(nullable: true)]
-    #[Groups(groups: ['lastname' => 'admin'])]
+    #[Groups(groups: ['lastConnectionAt' => 'admin'])]
+    #[SerializedName('lastConnectionAt')]
     private ?\DateTimeImmutable $lastConnectionAt = null;
 
     #[ORM\Column]

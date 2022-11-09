@@ -88,4 +88,14 @@ class UserRepository extends ServiceEntityRepository implements PasswordUpgrader
         $key = array_rand($users);
         return $users[$key];
     }
+
+    public function findAllOtherUsers (User $currentUser)
+    {
+        $builder = $this->createQueryBuilder('u');
+       return $builder
+            ->where('u.uuid != :uuid')
+            ->setParameter('uuid', $currentUser->getUuid())
+            ->getQuery()
+            ->getResult();
+    }
 }
