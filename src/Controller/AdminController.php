@@ -6,6 +6,8 @@ use App\Entity\User;
 use App\Repository\UserRepository;
 use App\Services\Mailer\MailerInterface;
 use Doctrine\Persistence\ManagerRegistry;
+use JMS\Serializer\SerializationContext;
+use JMS\Serializer\SerializerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
@@ -40,21 +42,27 @@ class AdminController extends AbstractController
 
     #[Route('/user/{uuid}', name: 'app_admin_user_single', methods: ['GET'])]
     #[ParamConverter('user', class: 'App\Request\ParamConverter\UserConverter')]
-    public function getOneByUuid(Request $request): JsonResponse
-    {
+    public function getOneByUuid(
+        Request $request,
+        SerializerInterface $serializer
+    ): JsonResponse {
         /** @var User $user */
         $user = $request->attributes->get('user');
         if (!$user) {
             return $this->json(['message'=> 'No User Found'], 404);
         }
 
-        return $this->json($user);
+        $json = $serializer->serialize($user, 'json', SerializationContext::create()->setGroups(['admin']));
+        return new JsonResponse($json, 200, [], true);
     }
 
     #[Route('/user', name: 'app_admin_create_user', methods: ['POST'])]
     #[ParamConverter('new-user', class: 'App\Request\ParamConverter\UserConverter')]
-    public function createUser(Request $request, MailerInterface $mailer): JsonResponse
-    {
+    public function createUser(
+        Request $request,
+        SerializerInterface $serializer,
+        MailerInterface $mailer
+    ): JsonResponse {
         /** @var User $user */
         $user = $request->attributes->get('new-user');
         $em = $this->doctrine->getManager();
@@ -77,6 +85,7 @@ class AdminController extends AbstractController
             $body
         );
 
-        return $this->json($user);
+        $json = $serializer->serialize($user, 'json', SerializationContext::create()->setGroups(['admin']));
+        return new JsonResponse($json, 200, [], true);
     }
 }

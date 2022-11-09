@@ -16,15 +16,15 @@ class Gift
     private ?int $id = null;
 
     #[ORM\Column(length: 255)]
-    #[Groups(groups: ['title' => 'gift','list'])]
+    #[Groups(groups: ['title' => 'gift','list', 'dashboard'])]
     private ?string $title = null;
 
     #[ORM\Column(type: Types::TEXT)]
-    #[Groups(groups: ['description' => 'gift','list'])]
+    #[Groups(groups: ['description' => 'gift','list', 'dashboard'])]
     private ?string $description = null;
 
     #[ORM\Column(length: 255, nullable: true)]
-    #[Groups(groups: ['link' => 'gift', 'list'])]
+    #[Groups(groups: ['link' => 'gift', 'list', 'dashboard'])]
     private ?string $link = null;
 
     #[ORM\ManyToOne(inversedBy: 'Gifts')]

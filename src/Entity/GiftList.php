@@ -7,6 +7,7 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use JMS\Serializer\Annotation\Groups;
+use JMS\Serializer\Annotation\SerializedName;
 
 #[ORM\Entity(repositoryClass: GiftListRepository::class)]
 class GiftList
@@ -17,13 +18,16 @@ class GiftList
     private ?int $id = null;
 
     #[ORM\Column]
+    #[Groups(groups: ['isPublished' => 'list', 'dashboard'])]
+    #[SerializedName('isPublished')]
     private ?bool $isPublished = null;
 
     #[ORM\OneToOne(mappedBy: 'giftList', cascade: ['persist', 'remove'])]
     private ?User $user = null;
 
     #[ORM\OneToMany(mappedBy: 'giftList', targetEntity: Gift::class, orphanRemoval: true)]
-    #[Groups(groups: ['gifts' => 'list'])]
+    #[Groups(groups: ['gifts' => 'list', 'dashboard'])]
+    #[SerializedName('gifts')]
     private Collection $Gifts;
 
     #[ORM\Column(length: 255)]

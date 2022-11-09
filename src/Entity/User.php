@@ -4,6 +4,8 @@ namespace App\Entity;
 
 use App\Repository\UserRepository;
 use Doctrine\ORM\Mapping as ORM;
+use JMS\Serializer\Annotation\Groups;
+use JMS\Serializer\Annotation\SerializedName;
 use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
 use Symfony\Component\Security\Core\User\UserInterface;
 
@@ -16,9 +18,11 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     private ?int $id = null;
 
     #[ORM\Column(length: 180, unique: true)]
+    #[Groups(groups: ['firstname' => 'admin'])]
     private ?string $uuid = null;
 
     #[ORM\Column]
+    #[Groups(groups: ['firstname' => 'admin'])]
     private array $roles = [];
 
     /**
@@ -28,27 +32,37 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     private ?string $password = null;
 
     #[ORM\Column(length: 50)]
+    #[Groups(groups: ['firstname' => 'dashboard', 'admin'])]
     private ?string $firstname = null;
 
     #[ORM\Column(length: 50)]
+    #[Groups(groups: ['lastname' => 'dashboard', 'admin'])]
     private ?string $lastname = null;
 
     #[ORM\Column(nullable: true)]
+    #[Groups(groups: ['lastname' => 'admin'])]
     private ?\DateTimeImmutable $lastConnectionAt = null;
 
     #[ORM\Column]
+    #[Groups(groups: ['lastname' => 'admin'])]
+    #[SerializedName('isActive')]
     private ?bool $isActive = null;
 
     #[ORM\Column(length: 255, unique: true)]
+    #[Groups(groups: ['lastname' => 'admin'])]
     private ?string $email = null;
 
     #[ORM\OneToOne(targetEntity: self::class, cascade: ['persist', 'remove'])]
     private ?self $recieveGiftFrom = null;
 
     #[ORM\OneToOne(targetEntity: self::class, cascade: ['persist', 'remove'])]
+    #[Groups(groups: ['partner' => 'dashboard'])]
+    #[SerializedName('partner')]
     private ?self $offerGiftTo = null;
 
     #[ORM\OneToOne(inversedBy: 'user', cascade: ['persist', 'remove'])]
+    #[Groups(groups: ['list' => 'dashboard'])]
+    #[SerializedName('list')]
     private ?GiftList $giftList = null;
 
     public function getId(): ?int
