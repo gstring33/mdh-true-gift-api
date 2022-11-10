@@ -56,6 +56,7 @@ class NewUserConverter implements ParamConverterInterface
             ->setFirstname($userModel->firstname)
             ->setLastname($userModel->lastname)
             ->setEmail($userModel->email)
+            ->setGender($userModel->gender)
             ->setIsActive(0)
             ->setUuid(uniqid('', false))
             ->setGiftList($list);

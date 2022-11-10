@@ -9,4 +9,5 @@ class UserModel
     public string $email;
     public string $password;
     public array $roles;
+    public string $gender;
 }
