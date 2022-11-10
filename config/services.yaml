@@ -46,6 +46,3 @@ services:
 
     App\Services\Mailer\MailerInterface:
         alias: App\Services\Mailer\Mailer
-
-    App\Normalizer\UserNormalizer:
-        tags: [serializer.normalizer]

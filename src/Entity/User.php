@@ -6,10 +6,18 @@ use App\Repository\UserRepository;
 use Doctrine\ORM\Mapping as ORM;
 use JMS\Serializer\Annotation\Groups;
 use JMS\Serializer\Annotation\SerializedName;
+use JMS\Serializer\Annotation\VirtualProperty;
 use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
 use Symfony\Component\Security\Core\User\UserInterface;
 
 #[ORM\Entity(repositoryClass: UserRepository::class)]
+#[VirtualProperty(
+    name: 'img',
+    exp: 'object.getFullname()',
+    options: [
+        [SerializedName::class, ['fullname']]
+    ]
+)]
 class User implements UserInterface, PasswordAuthenticatedUserInterface
 {
     #[ORM\Id]
@@ -67,6 +75,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     private ?GiftList $giftList = null;
 
     #[ORM\Column(length: 10)]
+    #[Groups(groups: ['gender' => 'dashboard', 'admin', 'dashboard_users'])]
     private ?string $gender = null;
 
     public function getId(): ?int
@@ -245,4 +254,13 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
 
         return $this;
     }
+
+    #[VirtualProperty()]
+    #[Groups(groups: ['fullname' => 'dashboard', 'admin', 'dashboard_users'])]
+    public function getFullname(): ?string
+    {
+        $letter = ucfirst($this->lastname[0]);
+        return "{$this->firstname} {$letter}.";
+    }
+
 }
