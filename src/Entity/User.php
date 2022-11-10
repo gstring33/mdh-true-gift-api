@@ -66,6 +66,9 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[SerializedName('list')]
     private ?GiftList $giftList = null;
 
+    #[ORM\Column(length: 10)]
+    private ?string $gender = null;
+
     public function getId(): ?int
     {
         return $this->id;
@@ -227,6 +230,18 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     public function setGiftList(?GiftList $giftList): self
     {
         $this->giftList = $giftList;
+
+        return $this;
+    }
+
+    public function getGender(): ?string
+    {
+        return $this->gender;
+    }
+
+    public function setGender(string $gender): self
+    {
+        $this->gender = $gender;
 
         return $this;
     }
