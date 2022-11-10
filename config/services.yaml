@@ -45,4 +45,4 @@ services:
             $logger: '@logger'
 
     App\Services\Mailer\MailerInterface:
-        alias: App\Services\Mailer\Mailer
+        alias: App\Services\Mailer\MailerMock
