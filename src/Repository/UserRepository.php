@@ -6,6 +6,7 @@ use App\Entity\User;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 use Symfony\Component\Security\Core\Exception\UnsupportedUserException;
+use Symfony\Component\Security\Core\Security;
 use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
 use Symfony\Component\Security\Core\User\PasswordUpgraderInterface;
 use function Doctrine\ORM\QueryBuilder;
@@ -20,9 +21,12 @@ use function Doctrine\ORM\QueryBuilder;
  */
 class UserRepository extends ServiceEntityRepository implements PasswordUpgraderInterface
 {
-    public function __construct(ManagerRegistry $registry)
+    private Security $security;
+
+    public function __construct(ManagerRegistry $registry, Security $security)
     {
         parent::__construct($registry, User::class);
+        $this->security = $security;
     }
 
     public function add(User $entity, bool $flush = false): void
@@ -92,10 +96,20 @@ class UserRepository extends ServiceEntityRepository implements PasswordUpgrader
     public function findAllOtherUsers (User $currentUser)
     {
         $builder = $this->createQueryBuilder('u');
-       return $builder
+        $users = $builder
             ->where('u.uuid != :uuid')
             ->setParameter('uuid', $currentUser->getUuid())
             ->getQuery()
             ->getResult();
+        $currentUser = $this->security->getUser();
+        $partnerSelected = $currentUser->getOfferGiftTo();
+        foreach ($users as $user) {
+            $gender = $user->getGender() === 'F' ? 'girl' : 'man';
+            $img = "user-{$gender}";
+            $img .= $partnerSelected !== null && $partnerSelected === $user ? '-success' : '-disable';
+            $user->setImg($img);
+        }
+
+        return $users;
     }
 }

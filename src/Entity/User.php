@@ -12,10 +12,17 @@ use Symfony\Component\Security\Core\User\UserInterface;
 
 #[ORM\Entity(repositoryClass: UserRepository::class)]
 #[VirtualProperty(
-    name: 'img',
+    name: 'fullname',
     exp: 'object.getFullname()',
     options: [
         [SerializedName::class, ['fullname']]
+    ]
+)]
+#[VirtualProperty(
+    name: 'img',
+    exp: 'object.getImg()',
+    options: [
+        [SerializedName::class, ['img']]
     ]
 )]
 class User implements UserInterface, PasswordAuthenticatedUserInterface
@@ -77,6 +84,9 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\Column(length: 10)]
     #[Groups(groups: ['gender' => 'dashboard', 'admin', 'dashboard_users'])]
     private ?string $gender = null;
+
+    #[Groups(groups: ['img' => 'dashboard_users'])]
+    private ?string $img = null;
 
     public function getId(): ?int
     {
@@ -261,6 +271,19 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     {
         $letter = ucfirst($this->lastname[0]);
         return "{$this->firstname} {$letter}.";
+    }
+
+    #[VirtualProperty()]
+    public function getImg(): ?string
+    {
+        return $this->img;
+    }
+
+    public function setImg(string $img): self
+    {
+        $this->img = $img;
+
+        return $this;
     }
 
 }
