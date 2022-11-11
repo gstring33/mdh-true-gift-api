@@ -20,10 +20,13 @@ use Symfony\Component\Security\Core\User\UserInterface;
 )]
 #[VirtualProperty(
     name: 'img',
-    exp: 'object.getImg()',
-    options: [
-        [SerializedName::class, ['img']]
-    ]
+    exp: 'object.getImg()'
+)]
+
+#[VirtualProperty(
+    name: 'isPartner',
+    exp: 'object.getIsPartner()',
+
 )]
 class User implements UserInterface, PasswordAuthenticatedUserInterface
 {
@@ -87,6 +90,10 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
 
     #[Groups(groups: ['img' => 'dashboard_users'])]
     private ?string $img = null;
+
+    #[Groups(groups: ['isPartner' => 'dashboard_users'])]
+    #[SerializedName('isPartner')]
+    private ?bool $isPartner = null;
 
     public function getId(): ?int
     {
@@ -282,6 +289,19 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     public function setImg(string $img): self
     {
         $this->img = $img;
+
+        return $this;
+    }
+
+    #[VirtualProperty()]
+    public function getIsPartner(): ?bool
+    {
+        return $this->getIsPartner();
+    }
+
+    public function setIsPartner(bool $isPartner): self
+    {
+        $this->isPartner = $isPartner;
 
         return $this;
     }
