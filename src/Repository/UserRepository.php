@@ -107,7 +107,7 @@ class UserRepository extends ServiceEntityRepository implements PasswordUpgrader
             $gender = $user->getGender() === 'F' ? 'girl' : 'man';
             $img = "user-{$gender}";
             if ($partnerSelected !== null) {
-                $img .= $partnerSelected === $user ? '-success' : '-disabled';
+                $img .= $partnerSelected === $user ? '-success' : '-disable';
             }
 
             $user->setImg($img);
