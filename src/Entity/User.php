@@ -299,7 +299,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         return $this->getIsPartner();
     }
 
-    public function setIsPartner(bool $isPartner): self
+    public function setIsPartner(?bool $isPartner): self
     {
         $this->isPartner = $isPartner;
 

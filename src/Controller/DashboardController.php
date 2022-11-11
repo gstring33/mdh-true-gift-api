@@ -61,7 +61,10 @@ class DashboardController extends AbstractController
             'total' => count($users),
             'users' => $users
         ];
-        $json = $serializer->serialize($dashboard, 'json', SerializationContext::create()->setGroups(['dashboard_users']));
+        $json = $serializer->serialize($dashboard, 'json', SerializationContext::create()
+            ->setGroups(['dashboard_users'])
+            ->setSerializeNull(true)
+        );
         return new JsonResponse($json, 200, [], true);
     }
 }
