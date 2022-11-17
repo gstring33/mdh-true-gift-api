@@ -34,6 +34,9 @@ class AuthenticationSuccessListener
         $data['isActive'] = $user->isActive();
         $data['isAdmin'] = in_array('ROLE_ADMIN', $user->getRoles());
         $data['uuid'] = $user->getUuid();
+        $data['firstname'] = $user->getFirstname();
+        $data['lastname'] = $user->getLastname();
+        $data['email'] = $user->getEmail();
         $event->setData($data);
     }
 }
