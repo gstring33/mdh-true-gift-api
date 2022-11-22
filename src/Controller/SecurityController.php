@@ -63,9 +63,9 @@ class SecurityController extends AbstractController
             $em->persist($user);
             $em->flush();
 
-            return $this->json(['Password changed successfully']);
+            return $this->json('Password changed successfully');
         }
 
-        return $this->json(['Password has not been changed'],400);
+        return $this->json('Password has not been changed',400);
     }
 }
