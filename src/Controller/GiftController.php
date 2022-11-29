@@ -140,9 +140,21 @@ class GiftController extends AbstractController
     }
 
     #[Route('/{uuid}', name: 'app_gift_delete', methods: ['DELETE'])]
-    public function delete(int $uuid): JsonResponse
+    #[ParamConverter('gift', class: 'App\Request\ParamConverter\GiftConverter')]
+    public function delete(
+        Request $request,
+    ): JsonResponse
     {
-        return $this->json('Gift with id ' . $uuid . ' successfully deleted');
+        /** @var Gift $gift */
+        $gift = $request->attributes->get('gift');
+        if (!$gift) {
+            return $this->json('Gift with id already deleted');
+        }
+        $em = $this->doctrine->getManager();
+        $em->remove($gift);
+        $em->flush();
+
+        return $this->json('Gift with id ' . $gift->getUuid() . ' successfully deleted');
     }
 
     private function validateGift(Gift $gift)
