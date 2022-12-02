@@ -31,6 +31,7 @@ class GiftList
     private Collection $Gifts;
 
     #[ORM\Column(length: 255)]
+    #[Groups(groups: ['gifts' => 'list'])]
     private ?string $uuid = null;
 
     public function __construct()
