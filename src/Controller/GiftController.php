@@ -55,7 +55,12 @@ class GiftController extends AbstractController
         $uuid = $decodedJwtToken['uuid'];
         $currentUser = $this->userRepository->findOneBy(['uuid' => $uuid]);
         $list = $currentUser->getGiftList()->getGifts();
-        $json = $serializer->serialize($list->toArray(), 'json', SerializationContext::create()->setGroups(['list']));
+        $json = $serializer->serialize(
+            $list->toArray(), 'json',
+            SerializationContext::create()
+                ->setGroups(['list'])
+                ->setSerializeNull(true)
+        );
         return new JsonResponse($json, 200, [], true);
     }
 
