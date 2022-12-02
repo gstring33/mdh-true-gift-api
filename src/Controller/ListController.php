@@ -40,7 +40,7 @@ class ListController extends AbstractController
         /** @var GiftList $list */
         $list = $request->attributes->get('list');
         if (!$list) {
-            return $this->json(['message'=> 'No List Found'], 404);
+            return $this->json(['error'=> 'No List Found'], 404);
         }
 
         $data = $request->getContent();
@@ -49,7 +49,7 @@ class ListController extends AbstractController
 
         $error = $this->validateList($list);
         if (!empty($error) || $list->getUuid() !== $uuid) {
-            return $this->json(['message' => 'The list could not be updated'], 400);
+            return $this->json(['error' => 'The list could not be updated'], 400);
         }
 
         $em = $this->doctrine->getManager();

@@ -91,7 +91,7 @@ class GiftController extends AbstractController
         $currentUser = $this->userRepository->findOneBy(['uuid' => $uuid]);
 
         if (!$currentUser) {
-            return $this->json(['message'=> 'No User Found'], 404);
+            return $this->json(['error'=> 'No User Found'], 404);
         }
 
         $list = $currentUser->getGiftList();
@@ -122,7 +122,7 @@ class GiftController extends AbstractController
         $gift = $request->attributes->get('gift');
 
         if (!$gift) {
-            return $this->json(['message'=> 'No Gift Found'], 404);
+            return $this->json(['error'=> 'No Gift Found'], 404);
         }
 
         $data = $request->getContent();
