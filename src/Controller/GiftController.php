@@ -126,11 +126,12 @@ class GiftController extends AbstractController
         }
 
         $data = $request->getContent();
-        $giftModel = $decoder->jsonDecode($data, GiftModel::class);
+        /** @var Gift $giftModel */
+        $giftModel = $decoder->jsonDecode($data, Gift::class);
         $gift
-            ->setTitle($giftModel->title)
-            ->setDescription($giftModel->description)
-            ->setLink($giftModel->link);
+            ->setTitle($giftModel->getTitle())
+            ->setDescription($giftModel->getDescription())
+            ->setLink($giftModel->getLink());
 
         $error = $this->validateGift($gift);
         if (!empty($error)) {
