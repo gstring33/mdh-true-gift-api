@@ -5,6 +5,8 @@ namespace App\Controller;
 use App\Entity\User;
 use App\Repository\UserRepository;
 use Doctrine\Persistence\ManagerRegistry;
+use JMS\Serializer\SerializationContext;
+use JMS\Serializer\SerializerInterface;
 use Lexik\Bundle\JWTAuthenticationBundle\Services\JWTTokenManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -33,9 +35,10 @@ class UserController extends AbstractController
         $this->doctrine = $doctrine;
     }
 
-    #[Route('/select-partner', name: 'app_user_select')]
-    public function select(): JsonResponse
+    #[Route('/select-partner', name: 'app_user_select', methods:['POST'])]
+    public function select(SerializerInterface $serializer): JsonResponse
     {
+        sleep(3);
         $decodedJwtToken = $this->jwtManager->decode($this->tokenStorage->getToken());
         $uuid = $decodedJwtToken['uuid'];
         $currentUser = $this->userRepository->findOneBy(['uuid' => $uuid]);
@@ -57,6 +60,15 @@ class UserController extends AbstractController
         $em->persist($partner);
         $em->flush();
 
-        return $this->json($partner);
+        $dashboard = [
+            'total' => 1,
+            'isPartnerSelected' => true,
+            'users' => [$partner]
+        ];
+        $json = $serializer->serialize($dashboard, 'json', SerializationContext::create()
+            ->setGroups(['dashboard_partner'])
+            ->setSerializeNull(true)
+        );
+        return new JsonResponse($json, 200, [], true);
     }
 }
