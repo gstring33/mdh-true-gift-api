@@ -37,8 +37,6 @@ class AuthenticationSuccessListener
         $data['firstname'] = $user->getFirstname();
         $data['lastname'] = $user->getLastname();
         $data['email'] = $user->getEmail();
-        $data['isPartnerSelected'] = $user?->getOfferGiftTo() !== null;
-        $data['isPartnerListPublished'] = $user?->getOfferGiftTo()?->getList()?->isPublished() !== null;
         $event->setData($data);
     }
 }

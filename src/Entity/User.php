@@ -50,11 +50,11 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     private ?string $password = null;
 
     #[ORM\Column(length: 50)]
-    #[Groups(groups: ['firstname' => 'dashboard', 'admin', 'dashboard_users'])]
+    #[Groups(groups: ['firstname' => 'dashboard', 'admin', 'dashboard_users', 'dashboard_partner'])]
     private ?string $firstname = null;
 
     #[ORM\Column(length: 50)]
-    #[Groups(groups: ['lastname' => 'dashboard', 'admin', 'dashboard_users'])]
+    #[Groups(groups: ['lastname' => 'dashboard', 'admin', 'dashboard_users', 'dashboard_partner'])]
     private ?string $lastname = null;
 
     #[ORM\Column(nullable: true)]
@@ -63,7 +63,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     private ?\DateTimeImmutable $lastConnectionAt = null;
 
     #[ORM\Column]
-    #[Groups(groups: ['lastname' => 'admin'])]
+    #[Groups(groups: ['lastname' => 'admin', 'dashboard_partner'])]
     #[SerializedName('isActive')]
     private ?bool $isActive = null;
 
@@ -80,15 +80,15 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     private ?self $offerGiftTo = null;
 
     #[ORM\OneToOne(inversedBy: 'user', cascade: ['persist', 'remove'])]
-    #[Groups(groups: ['list' => 'dashboard'])]
+    #[Groups(groups: ['list' => 'dashboard', 'dashboard_partner'])]
     #[SerializedName('list')]
     private ?GiftList $giftList = null;
 
     #[ORM\Column(length: 10)]
-    #[Groups(groups: ['gender' => 'dashboard', 'admin', 'dashboard_users'])]
+    #[Groups(groups: ['gender' => 'dashboard', 'admin', 'dashboard_users', 'dashboard_partner'])]
     private ?string $gender = null;
 
-    #[Groups(groups: ['img' => 'dashboard_users'])]
+    #[Groups(groups: ['img' => 'dashboard_users', 'dashboard_partner'])]
     private ?string $img = null;
 
     #[Groups(groups: ['isPartner' => 'dashboard_users'])]
@@ -273,7 +273,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     }
 
     #[VirtualProperty()]
-    #[Groups(groups: ['fullname' => 'dashboard', 'admin', 'dashboard_users'])]
+    #[Groups(groups: ['fullname' => 'dashboard', 'admin', 'dashboard_users', 'dashboard_partner'])]
     public function getFullname(): ?string
     {
         $letter = ucfirst($this->lastname[0]);

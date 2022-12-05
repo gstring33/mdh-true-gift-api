@@ -56,9 +56,23 @@ class DashboardController extends AbstractController
         $decodedJwtToken = $this->jwtManager->decode($this->tokenStorage->getToken());
         $uuid = $decodedJwtToken['uuid'];
         $currentUser = $this->userRepository->findOneBy(['uuid' => $uuid]);
+        $partner = $currentUser->getOfferGiftTo();
+        if ($partner !== null) {
+            $dashboard = [
+                'total' => 1,
+                'isPartnerSelected' => true,
+                'users' => [$partner]
+            ];
+            $json = $serializer->serialize($dashboard, 'json', SerializationContext::create()
+                ->setGroups(['dashboard_partner'])
+                ->setSerializeNull(true)
+            );
+            return new JsonResponse($json, 200, [], true);
+        }
         $users = $this->userRepository->findAllOtherUsers($currentUser);
         $dashboard = [
             'total' => count($users),
+            'isPartnerSelected' => false,
             'users' => $users
         ];
         $json = $serializer->serialize($dashboard, 'json', SerializationContext::create()

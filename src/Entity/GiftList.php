@@ -18,7 +18,7 @@ class GiftList
     private ?int $id = null;
 
     #[ORM\Column]
-    #[Groups(groups: ['isPublished' => 'list', 'dashboard'])]
+    #[Groups(groups: ['isPublished' => 'list', 'dashboard', 'dashboard_partner'])]
     #[SerializedName('isPublished')]
     private ?bool $isPublished = null;
 
@@ -26,7 +26,7 @@ class GiftList
     private ?User $user = null;
 
     #[ORM\OneToMany(mappedBy: 'giftList', targetEntity: Gift::class, orphanRemoval: true)]
-    #[Groups(groups: ['gifts' => 'list', 'dashboard'])]
+    #[Groups(groups: ['gifts' => 'list', 'dashboard', 'dashboard_partner'])]
     #[SerializedName('gifts')]
     private Collection $Gifts;
 
