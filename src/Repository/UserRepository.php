@@ -86,12 +86,8 @@ class UserRepository extends ServiceEntityRepository implements PasswordUpgrader
                 return $u->getOfferGiftTo() !== $currentUser;
             });
 
-            foreach($userSelected as &$val) {
-                $val = array_values($val);
-            }
-
             if (count($userSelected) === 1) {
-                return $userSelected[0];
+                return $userSelected[0] ?? $userSelected[1];
             }
         }
         $key = array_rand($users);
