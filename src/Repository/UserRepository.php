@@ -85,6 +85,11 @@ class UserRepository extends ServiceEntityRepository implements PasswordUpgrader
             $userSelected = array_filter($users, function (User $u) use ($currentUser) {
                 return $u->getOfferGiftTo() !== $currentUser;
             });
+
+            foreach($userSelected as &$val) {
+                $val = array_values($val);
+            }
+
             if (count($userSelected) === 1) {
                 return $userSelected[0];
             }
