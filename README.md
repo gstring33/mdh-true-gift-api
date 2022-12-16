@@ -1,6 +1,5 @@
 ## Project
 
------
 The aim of the api is to provide the payload for the true-gift client-side application.
 
 ### Purpose
@@ -27,14 +26,12 @@ The aim of the api is to provide the payload for the true-gift client-side appli
 
 ## Requirements 
 
------
 * PHP 8.0.2 or higher;
 * composer
 * and the [usual Symfony application requirements](https://symfony.com/doc/6.0/setup.html#technical-requirements).
 
 ## Installation
 
------
 Install dependencies
 ``` bash
 composer install
